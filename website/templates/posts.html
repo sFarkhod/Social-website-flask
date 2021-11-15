@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container my-5">
+
+
+        <div class="row align-items-start">
+
+            <div class="col">
+
+                {% if posts|length != 0 %}
+                {% for post in posts %}
+
+                <div class="card my-3" style="width: 18rem;">
+                    {% if post.link|length != 0 %}
+                    <img src="{{ post.link }}" class="card-img-top" alt="...">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">From {{ post.by }} <br> {{ post.date.strftime('%d/%m/%Y-%H:%M') }}</h5>
+                        <p class="card-text">{{ post.desc }}</p>
+                    </div>
+                </div>
+                
+                {% endfor %}
+                {% else %}
+
+                <div class="alert alert-dark" role="alert">
+                    Sorry but no posts were found. Try posting something.
+                </div>
+
+                {% endif %}
+           
+            </div>
+
+            <div class="col">
+                <p>Hello, {{ current_user.username }}</p>
+                <p>Want to post something, <a href="create-post"><button class="btn btn-outline-dark">Create a
+                            Post</button></a></p>
+            </div>
+
+        </div>
+
+
+    </div>
+</body>
+
+</html>

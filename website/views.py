@@ -1,11 +1,14 @@
+# kerakli barcha modullarni import qilib olamiz
+# from os import link
 from flask import Blueprint, render_template, request, redirect, url_for
-from .models import Users
+from .models import Posts, Users
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from . import db
 
 views = Blueprint("views", __name__)
 
+# har bir sessiya (page) uchun alohida route yaratamiz 
 @views.route('/')
 def mainroute():
     return "<h1>Hello world"
@@ -53,13 +56,31 @@ def register():
     return render_template("register.html")
 
 
-@login_required
 @views.route('/posts')
+@login_required
 def posts():
-    return "<h1>Welcome to posts"
+    posts = Posts.query.all()
+    return render_template('posts.html', posts=posts[::-1])
 
 @login_required
 @views.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('views.mainroute'))
+
+
+# ////////////////////////////////////////////////////////////////////////////////
+
+# for posts
+
+@views.route('create-post', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    if request.method == 'POST':
+        link = request.form.get('link')
+        desc = request.form.get('desc')
+        data = Posts(by=current_user.username, link=link, desc=desc)
+        db.session.add(data)
+        db.session.commit()
+        return redirect(url_for('views.posts'))
+    return render_template('createpost.html')
