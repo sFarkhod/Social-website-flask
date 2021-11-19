@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 # from os import link
 from . import db
 from flask_login import UserMixin
@@ -11,7 +11,7 @@ class Users(db.Model, UserMixin):
     password = db.Column(db.String(150))
 
 
-# post klasi. 
+# post cllasi. 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     by = db.Column(db.String(100))
@@ -19,4 +19,13 @@ class Posts(db.Model):
     desc = db.Column(db.String(200))  # agar description uchun so'zlar uzunligi kam bo'lsa uzaytiramiz.
     date = db.Column(db.DateTime, default=datetime.now())
 
+
+# messagelar uchun yangi class
+class Messages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room = db.Column(db.String(10))
+    by = db.Column(db.String(10))
+    to = db.Column(db.String(10))
+    message = db.Column(db.String(500))
+    time = db.Column(db.DateTime, default=datetime.now())
 

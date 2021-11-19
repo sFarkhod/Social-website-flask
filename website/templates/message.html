@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Message</title>
+        <link rel="stylesheet" href="../static/styles.css">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+        <!-- FontAwesome ICONS -->
+        <script src="https://kit.fontawesome.com/16fda319fc.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="grid">
+            <div class="app">
+                <div class="sidebar">
+                    <div class="search-chat">
+                        <div class="search-bar">
+                            <input type="text" placeholder="Enter username to chat:" class="input-required" id="input_field"><button type="submit" class="btn btn-lg" id="submit-btn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                    <!-- Chats -->
+                    <div class="chats">
+                        {% for name in people %}
+                            <div class="chat">
+                                <a href="/message/to={{name}}" class="fill-div">
+                                    <div class="chat-right">
+                                        <div class="chat-right-top">
+                                            <span class="contact-name">{{name}}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="main" style="background-image: url('../static/bg-for-web.jpg'); background-size: cover;"></div>
+            </div>
+        </div>
+        <script src="../static/main.js"></script>
+    </body>
+</html>

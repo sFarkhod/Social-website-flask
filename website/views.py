@@ -1,10 +1,11 @@
 # kerakli barcha modullarni import qilib olamiz
 # from os import link
 from flask import Blueprint, render_template, request, redirect, url_for
-from .models import Posts, Users
+from .models import Posts, Users, Messages
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from . import db
+
 
 views = Blueprint("views", __name__)
 
@@ -84,3 +85,54 @@ def create_post():
         db.session.commit()
         return redirect(url_for('views.posts'))
     return render_template('createpost.html')
+
+
+# /////////////////////////////////////////////////////////////////////////////////////
+
+# for messages
+@views.route('/message')
+@login_required
+def message():
+    data1 = Messages.query.filter_by(to=current_user.username).all()
+    data2 = Messages.query.filter_by(to=current_user.username).all()
+    data = []
+
+    for da in data1:
+        data.append(da)
+    for da in data2:
+        data.append(da)
+    data = list(dict.fromkeys(data))
+
+    return render_template('message.html', people=data)
+
+
+
+
+@views.route('/message/to=<string:to>')
+@login_required
+def message_to(to):
+    exists = Users.query.filter_by(username=to).first()
+
+    if exists:
+        l1 = Messages.query.filter_by(to=current_user.username).all()
+        l2 = Messages.query.filter_by(by=current_user.username).all()
+        d = []
+
+        for da in l1:
+            d.append(da)
+        for da in l2:
+            d.append(da)
+        d = list(dict.fromkeys(d))
+
+        data1 = Messages.query.filter_by(room=f'{to}-{current_user.username}').fisrt()
+        data2 = Messages.query.filter_by(room=f'{current_user.username}-{to}').fisrt()
+        data = []
+        
+        for da in data1:
+            data.append(da)
+        for da in data2:
+            data.append(da)
+        data.sort(key = lambda d:d.id)
+
+        return render_template('message-to.html', to=to, data=data, uname=current_user.username, people=d)
+    return redirect(url_for('views.message'))
