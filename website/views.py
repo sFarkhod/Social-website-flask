@@ -1,18 +1,20 @@
 # kerakli barcha modullarni import qilib olamiz
 # from os import link
+from ntpath import join
 from flask import Blueprint, render_template, request, redirect, url_for
 from .models import Posts, Users, Messages
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
-from . import db
+from . import db, socketio
+from datetime import datetime, time
 
 
 views = Blueprint("views", __name__)
 
 # har bir sessiya (page) uchun alohida route yaratamiz 
 @views.route('/')
-def mainroute():
-    return "<h1>Hello world"
+# def mainroute():
+#     return "<h1>Hello world"
 
 @views.route('/login', methods=['GET', 'POST'])
 def login():
@@ -98,9 +100,9 @@ def message():
     data = []
 
     for da in data1:
-        data.append(da)
+        data.append(da.by)
     for da in data2:
-        data.append(da)
+        data.append(da.to)
     data = list(dict.fromkeys(data))
 
     return render_template('message.html', people=data)
@@ -119,13 +121,13 @@ def message_to(to):
         d = []
 
         for da in l1:
-            d.append(da)
+            d.append(da.by)
         for da in l2:
-            d.append(da)
+            d.append(da.to)
         d = list(dict.fromkeys(d))
 
-        data1 = Messages.query.filter_by(room=f'{to}-{current_user.username}').fisrt()
-        data2 = Messages.query.filter_by(room=f'{current_user.username}-{to}').fisrt()
+        data1 = Messages.query.filter_by(room=f'{to}-{current_user.username}').all()
+        data2 = Messages.query.filter_by(room=f'{current_user.username}-{to}').all()
         data = []
         
         for da in data1:
@@ -136,3 +138,28 @@ def message_to(to):
 
         return render_template('message-to.html', to=to, data=data, uname=current_user.username, people=d)
     return redirect(url_for('views.message'))
+
+
+
+# for socketio 
+
+@socketio.on('join_room')
+def handle_join_room_event(data):
+    room = data['room']
+    data = room.split('-')
+    room2 = f'{data[1]}-{data[0]}'
+    join_room(room)
+    join_room(room2)
+    print('Joined')
+
+@socketio.on('send_message')
+def handle_send_message(data):
+    room = data['room']
+    d = room.split('-')
+    room2 = f'{d[1]}-{d[0]}'
+    time = data['time']
+    time_obj = datetime.strptime(time, '%d-%m-%Y@%H:%M')
+    message_data = Messages(room=room, to=d[0], by=d[1], message=data['message'], time=time_obj)
+    db.session.add(message_data)
+    db.session.commit()
+    socketio.emit('receive_message', data, room=(room, room2))

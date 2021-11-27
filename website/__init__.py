@@ -5,10 +5,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from os import path
+from flask_socketio import SocketIO
 
 # some configuration our database
 # database uchun kerakli config lar 
 db = SQLAlchemy()
+socketio = SocketIO()
 
 def createapp():
     #Initializing the app
@@ -21,6 +23,7 @@ def createapp():
     db.init_app(app)
     loginmanager = LoginManager(app)
     loginmanager.login_view = '/'
+    socketio.init_app(app)
 
     # routelarni yaratib olamiz
     from .views import views
@@ -35,7 +38,7 @@ def createapp():
 
     #Returning the app
     # app ni return qilamiz.
-    return app
+    return socketio, app
 
 def createdatabase(app):
     if not path.exists("website/database.db"):
